@@ -1,4 +1,4 @@
-import React, { useState, useEffect, FormEvent } from "react";
+import React, { FormEvent, useEffect, useState } from "react";
 import { Button, Col, Form, Row } from "react-bootstrap";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import FormContainer from "../components/FormContainer";
@@ -7,36 +7,56 @@ import Message from "../components/Message";
 import { useActions } from "../hooks/useActions";
 import { useTypedSelector } from "../hooks/useTypedSelector";
 
-interface ILoginScreenProps {}
-
-const LoginScreen: React.FC<ILoginScreenProps> = (props) => {
+const RegisterScreen = () => {
+    const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const location = useLocation();
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [message, setMessage] = useState("");
+
     const navigate = useNavigate();
+    const location = useLocation();
+
+    const { register } = useActions();
+    const { loading, error, userInfo } = useTypedSelector(
+        (state) => state.userRegister
+    );
 
     const redirect = location.search ? location.search.split("=")[1] : "/";
-    const { login } = useActions();
-    const { loading, error, userInfo } = useTypedSelector(
-        (state) => state.userLogin
-    );
+
     useEffect(() => {
         if (userInfo) {
             navigate(redirect);
+            console.log("WORKING", userInfo);
         }
     }, [navigate, userInfo, redirect]);
 
     const submitHandler = (e: FormEvent) => {
         e.preventDefault();
-        login(email, password);
+        if (password !== confirmPassword) {
+            setMessage("Passwords do not match");
+        } else {
+            register(name, email, password);
+        }
     };
 
     return (
         <FormContainer>
-            <h1>Sign In</h1>
+            <h1>Sign Up</h1>
+            {message && <Message variant="danger">{message}</Message>}
             {error && <Message variant="danger">{error}</Message>}
             {loading && <Loader />}
             <Form onSubmit={submitHandler}>
+                <Form.Group controlId="name">
+                    <Form.Label>Name</Form.Label>
+                    <Form.Control
+                        type="name"
+                        placeholder="Enter name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                    ></Form.Control>
+                </Form.Group>
+
                 <Form.Group controlId="email">
                     <Form.Label>Email Address</Form.Label>
                     <Form.Control
@@ -48,7 +68,7 @@ const LoginScreen: React.FC<ILoginScreenProps> = (props) => {
                 </Form.Group>
 
                 <Form.Group controlId="password">
-                    <Form.Label>Password Address</Form.Label>
+                    <Form.Label>Password</Form.Label>
                     <Form.Control
                         type="password"
                         placeholder="Enter password"
@@ -57,22 +77,28 @@ const LoginScreen: React.FC<ILoginScreenProps> = (props) => {
                     ></Form.Control>
                 </Form.Group>
 
+                <Form.Group controlId="confirmPassword">
+                    <Form.Label>Confirm Password</Form.Label>
+                    <Form.Control
+                        type="password"
+                        placeholder="Confirm password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                    ></Form.Control>
+                </Form.Group>
+
                 <Button type="submit" variant="primary">
-                    Sign In
+                    Register
                 </Button>
             </Form>
 
             <Row className="py-3">
                 <Col>
-                    New Customer?{" "}
+                    Have an Account?{" "}
                     <Link
-                        to={
-                            redirect
-                                ? `/register?redirect=${redirect}`
-                                : "/register"
-                        }
+                        to={redirect ? `/login?redirect=${redirect}` : "/login"}
                     >
-                        Register
+                        Login
                     </Link>
                 </Col>
             </Row>
@@ -80,4 +106,4 @@ const LoginScreen: React.FC<ILoginScreenProps> = (props) => {
     );
 };
 
-export default LoginScreen;
+export default RegisterScreen;

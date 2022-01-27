@@ -1,5 +1,5 @@
 import { ProductDetailsI, StateI } from "../constants/productConstants";
-import { UserI } from "../constants/userConstants";
+import {  UserDetailsI, UserLoginI, UserRegisterI } from "../constants/userConstants";
 
 export const initialProductListState: StateI = {
     products: [],
@@ -29,9 +29,23 @@ export const initialCartState = {
     cartItems: [],
 };
 
-// ! UserReducer
-export const initialUserState: UserI = {
+// ! userLoginReducer
+export const initialLoginState: UserLoginI = {
     loading: false,
-    userInfo: {},
+    userInfo: null,
+    error: null,
+};
+
+// ! userRegisterReducer
+export const initialRegisterState: UserRegisterI = {
+    loading: false,
+    userInfo: null,
+    error: null,
+};
+
+// ! userDEtailsReducer
+export const initialUserDetailsState: UserDetailsI = {
+    loading: false,
+    user: null,
     error: null,
 };
